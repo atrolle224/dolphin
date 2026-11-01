@@ -212,9 +212,10 @@ const std::vector<std::unique_ptr<VideoBackendBase>>& VideoBackendBase::GetAvail
     backends.push_back(std::make_unique<OGL::VideoBackend>());
 #endif
 #ifdef HAS_VULKAN
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(DOLPHIN_477M)
     // Emplace the Vulkan backend at the beginning so it takes precedence over OpenGL.
     // On macOS, we prefer Vulkan over OpenGL due to OpenGL support being deprecated by Apple.
+    // On the RG477M's Mali-G615 the Vulkan driver is the faster one.
     backends.emplace(backends.begin(), std::make_unique<Vulkan::VideoBackend>());
 #else
     backends.push_back(std::make_unique<Vulkan::VideoBackend>());

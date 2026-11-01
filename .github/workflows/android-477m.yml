@@ -32,7 +32,10 @@ jobs:
           NDK=$(grep -oP 'ndkVersion = "\K[^"]+' Source/Android/app/build.gradle.kts)
           SDK=$(grep -oP 'compileSdk = \K[0-9]+' Source/Android/app/build.gradle.kts)
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
-          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$NDK" "platforms;android-$SDK" >/dev/null
+          SM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          "$SM" "ndk;$NDK" >/dev/null
+          # newer platforms are published as android-NN.0; Gradle fetches it itself otherwise
+          "$SM" "platforms;android-$SDK" >/dev/null 2>&1 || "$SM" "platforms;android-$SDK.0" >/dev/null 2>&1 || echo "platform $SDK left to Gradle"
           sudo apt-get install -y -qq ninja-build >/dev/null
 
       - name: arm64 only, no unit tests

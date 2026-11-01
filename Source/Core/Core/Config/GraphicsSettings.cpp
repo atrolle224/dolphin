@@ -88,7 +88,16 @@ const Info<bool> GFX_ENABLE_PIXEL_LIGHTING{{System::GFX, "Settings", "EnablePixe
 const Info<bool> GFX_FAST_DEPTH_CALC{{System::GFX, "Settings", "FastDepthCalc"}, true};
 const Info<u32> GFX_MSAA{{System::GFX, "Settings", "MSAA"}, 1};
 const Info<bool> GFX_SSAA{{System::GFX, "Settings", "SSAA"}, false};
-const Info<int> GFX_EFB_SCALE{{System::GFX, "Settings", "InternalResolution"}, 1};
+// Dolphin 477M (DOLPHIN_477M): defaults for the Anbernic RG477M (1280x960, Mali-G615), the
+// values a fresh install starts with. 2x is 1280x1056 for a 640x528 EFB, the nearest to the
+// screen; async shaders skip a draw until its shader is ready instead of stuttering, and the
+// cached ones are compiled before a game starts.
+#ifdef DOLPHIN_477M
+#define D477M(rg477m, upstream) rg477m
+#else
+#define D477M(rg477m, upstream) upstream
+#endif
+const Info<int> GFX_EFB_SCALE{{System::GFX, "Settings", "InternalResolution"}, D477M(2, 1)};
 const Info<int> GFX_MAX_EFB_SCALE{{System::GFX, "Settings", "MaxInternalResolution"}, 12};
 const Info<bool> GFX_TEXFMT_OVERLAY_ENABLE{{System::GFX, "Settings", "TexFmtOverlayEnable"}, false};
 const Info<bool> GFX_TEXFMT_OVERLAY_CENTER{{System::GFX, "Settings", "TexFmtOverlayCenter"}, false};
@@ -106,10 +115,16 @@ const Info<int> GFX_COMMAND_BUFFER_EXECUTE_INTERVAL{
 
 const Info<bool> GFX_SHADER_CACHE{{System::GFX, "Settings", "ShaderCache"}, true};
 const Info<bool> GFX_WAIT_FOR_SHADERS_BEFORE_STARTING{
-    {System::GFX, "Settings", "WaitForShadersBeforeStarting"}, false};
+    {System::GFX, "Settings", "WaitForShadersBeforeStarting"}, D477M(true, false)};
 const Info<ShaderCompilationMode> GFX_SHADER_COMPILATION_MODE{
-    {System::GFX, "Settings", "ShaderCompilationMode"}, ShaderCompilationMode::Synchronous};
-const Info<int> GFX_SHADER_COMPILER_THREADS{{System::GFX, "Settings", "ShaderCompilerThreads"}, 1};
+    {System::GFX, "Settings", "ShaderCompilationMode"},
+    D477M(ShaderCompilationMode::AsynchronousSkipRendering, ShaderCompilationMode::Synchronous)};
+const Info<int> GFX_SHADER_COMPILER_THREADS{{System::GFX, "Settings", "ShaderCompilerThreads"},
+                                            D477M(2, 1)};
+// Lift the Arm driver bug BUG_PRIMITIVE_RESTART (VideoCommon/DriverDetails.cpp), which turns
+// primitive restart off on every Arm Vulkan driver. Off: the workaround stays, as upstream.
+const Info<bool> GFX_MALI_ALLOW_PRIMITIVE_RESTART{
+    {System::GFX, "Settings", "MaliAllowPrimitiveRestart"}, false};
 const Info<int> GFX_SHADER_PRECOMPILER_THREADS{
     {System::GFX, "Settings", "ShaderPrecompilerThreads"}, -1};
 const Info<bool> GFX_SAVE_TEXTURE_CACHE_TO_STATE{

@@ -184,6 +184,7 @@ extern const Info<bool> GFX_HACK_VERTEX_ROUNDING;
 extern const Info<bool> GFX_HACK_VI_SKIP;
 extern const Info<u32> GFX_HACK_MISSING_COLOR_VALUE;
 extern const Info<bool> GFX_HACK_FAST_TEXTURE_SAMPLING;
+extern const Info<bool> GFX_MALI_ALLOW_PRIMITIVE_RESTART;
 #ifdef __APPLE__
 extern const Info<bool> GFX_HACK_NO_MIPMAPPING;
 #endif

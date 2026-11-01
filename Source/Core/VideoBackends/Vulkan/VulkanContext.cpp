@@ -1023,7 +1023,7 @@ void VulkanContext::InitDriverDetails()
     vendor = DriverDetails::VENDOR_QUALCOMM;
     driver = DriverDetails::DRIVER_QUALCOMM;
   }
-  else if (vendor_id == 0x13B6 || device_name.contains("Mali"))
+  else if (vendor_id == 0x13B5 || device_name.contains("Mali"))  // Arm's PCI vendor ID
   {
     // Currently only the ARM binary driver exists for Mali.
     vendor = DriverDetails::VENDOR_ARM;

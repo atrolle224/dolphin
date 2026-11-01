@@ -1,0 +1,63 @@
+# Builds Dolphin 477M (org.dolphinemu.dolphinemu.rg477m): the Android app with the RG477M
+# defaults (-DDOLPHIN_477M=ON, Source/Android/app/build.gradle.kts), arm64 only, debug-signed so
+# it installs as is. Native code is RelWithDebInfo in this build type, as upstream.
+name: Android APK (477M)
+
+on:
+  push:
+    branches: [master]
+    paths-ignore: ['**/*.md', 'docs/**', 'Languages/**']
+  workflow_dispatch:
+
+concurrency:
+  group: android-477m-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Android SDK pieces
+        run: |
+          NDK=$(grep -oP 'ndkVersion = "\K[^"]+' Source/Android/app/build.gradle.kts)
+          SDK=$(grep -oP 'compileSdk = \K[0-9]+' Source/Android/app/build.gradle.kts)
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;$NDK" "platforms;android-$SDK" >/dev/null
+          sudo apt-get install -y -qq ninja-build >/dev/null
+
+      - name: arm64 only, no unit tests
+        working-directory: Source/Android/app
+        run: |
+          sed -i 's|abiFilters += listOf("arm64-v8a", "x86_64")|abiFilters += listOf("arm64-v8a")|' build.gradle.kts
+          sed -i 's|^\(\s*\)//targets(|\1targets(|' build.gradle.kts
+          grep -n 'abiFilters\|targets(' build.gradle.kts
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            Source/Android/app/.cxx
+          key: dolphin-477m-${{ hashFiles('Source/Android/**/*.kts', 'Source/Android/gradle/libs.versions.toml') }}-${{ github.sha }}
+          restore-keys: dolphin-477m-${{ hashFiles('Source/Android/**/*.kts', 'Source/Android/gradle/libs.versions.toml') }}-
+
+      - name: APK
+        working-directory: Source/Android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dolphin-477m-arm64
+          path: Source/Android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error

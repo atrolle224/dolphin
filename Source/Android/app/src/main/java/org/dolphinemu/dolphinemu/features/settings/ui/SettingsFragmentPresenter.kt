@@ -1894,6 +1894,14 @@ class SettingsFragmentPresenter(
                 R.string.gpu_texture_decoding_description
             )
         )
+        sl.add(
+            SwitchSetting(
+                context,
+                BooleanSetting.GFX_MALI_ALLOW_PRIMITIVE_RESTART,
+                R.string.mali_allow_primitive_restart,
+                R.string.mali_allow_primitive_restart_description
+            )
+        )
 
         sl.add(HeaderSetting(context, R.string.external_frame_buffer, 0))
         sl.add(

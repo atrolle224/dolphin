@@ -36,7 +36,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.dolphinemu.dolphinemu"
+        // Dolphin 477M: its own package, beside the official app, with fresh (477M) defaults
+        applicationId = "org.dolphinemu.dolphinemu.rg477m"
         minSdk = 24
         targetSdk = 37
 
@@ -81,9 +82,8 @@ android {
         // Signed by debug key disallowing distribution on Play Store.
         // Attaches "debug" suffix to version and package name, allowing installation alongside the release build.
         debug {
-            resValue("string", "app_name_suffixed", "Dolphin Debug")
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
+            resValue("string", "app_name_suffixed", "Dolphin 477M")
+            versionNameSuffix = "-477m"
             isJniDebuggable = true
         }
     }
@@ -108,7 +108,8 @@ android {
                 arguments(
                     "-DANDROID_STL=c++_static",
                     "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
-                    "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
+                    "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+                    "-DDOLPHIN_477M=ON"
                     // , "-DENABLE_GENERIC=ON"
                 )
 

@@ -212,11 +212,13 @@ const std::vector<std::unique_ptr<VideoBackendBase>>& VideoBackendBase::GetAvail
     backends.push_back(std::make_unique<Vulkan::VideoBackend>());
 #endif
 #ifdef HAS_OPENGL
-#ifdef ANDROID
+#if defined(ANDROID) && !defined(DOLPHIN_477M)
     // Emplace the OpenGL backend at the beginning so it takes precedence over Vulkan.
     // On Android, we prefer OpenGL over Vulkan due to OpenGL supporting more features.
     backends.emplace(backends.begin(), std::make_unique<OGL::VideoBackend>());
 #else
+    // Dolphin 477M: Vulkan stays first, so it is the default. On the RG477M's Mali-G615 the
+    // Vulkan driver is the faster and better-maintained one; OpenGL remains selectable.
     backends.push_back(std::make_unique<OGL::VideoBackend>());
 #endif
 #endif

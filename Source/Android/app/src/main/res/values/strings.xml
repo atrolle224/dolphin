@@ -287,6 +287,8 @@
     <string name="texture_cache_accuracy">Texture Cache Accuracy</string>
     <string name="texture_cache_accuracy_description">The safer the selection, the less likely the emulator will be missing any texture updates from RAM.</string>
     <string name="gpu_texture_decoding">GPU Texture Decoding</string>
+    <string name="mali_allow_primitive_restart">Mali: Allow Primitive Restart</string>
+    <string name="mali_allow_primitive_restart_description">Dolphin turns primitive restart off on every Mali Vulkan driver because older drivers broke it. Turning this on lets newer drivers use it, which needs fewer draw calls. If a game shows missing or stretched geometry with it on, turn it off. Takes effect when a game starts.</string>
     <string name="gpu_texture_decoding_description">Decodes textures on the GPU using compute shaders where supported. May improve performance in some scenarios.</string>
     <string name="external_frame_buffer">External Frame Buffer</string>
     <string name="xfb_copy_method">Store XFB Copies to Texture Only</string>

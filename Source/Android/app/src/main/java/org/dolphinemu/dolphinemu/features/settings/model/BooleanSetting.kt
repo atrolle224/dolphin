@@ -746,6 +746,12 @@ enum class BooleanSetting(
         "EnableGPUTextureDecoding",
         false
     ),
+    GFX_MALI_ALLOW_PRIMITIVE_RESTART(
+        Settings.FILE_GFX,
+        Settings.SECTION_GFX_SETTINGS,
+        "MaliAllowPrimitiveRestart",
+        false
+    ),
     GFX_ENABLE_PIXEL_LIGHTING(
         Settings.FILE_GFX,
         Settings.SECTION_GFX_SETTINGS,

@@ -52,11 +52,12 @@ object Rg477mControllers {
 
     /** Dolphin's device string for the built-in gamepad, else the first connected one. */
     private fun gamepadDeviceString(): String? {
-        val pads = InputDevice.getDeviceIds().mapNotNull { InputDevice.getDevice(it) }.filter {
-            !it.isVirtual &&
-                (it.sources and InputDevice.SOURCE_GAMEPAD == InputDevice.SOURCE_GAMEPAD ||
-                    it.sources and InputDevice.SOURCE_JOYSTICK == InputDevice.SOURCE_JOYSTICK)
-        }
+        val pads = InputDevice.getDeviceIds().toList().mapNotNull { id -> InputDevice.getDevice(id) }
+            .filter { d ->
+                !d.isVirtual &&
+                    ((d.sources and InputDevice.SOURCE_GAMEPAD) == InputDevice.SOURCE_GAMEPAD ||
+                        (d.sources and InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK)
+            }
         val ordered = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             pads.sortedBy { it.isExternal }
         } else {
@@ -64,8 +65,8 @@ object Rg477mControllers {
         }
         val strings = ControllerInterface.getAllDeviceStrings()
         for (pad in ordered) {
-            strings.firstOrNull { it.startsWith("Android/") && it.endsWith("/" + pad.name) }
-                ?.let { return it }
+            val match = strings.firstOrNull { s -> s.startsWith("Android/") && s.endsWith("/" + pad.name) }
+            if (match != null) return match
         }
         return null
     }

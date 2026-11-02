@@ -66,6 +66,7 @@ import org.dolphinemu.dolphinemu.utils.AfterDirectoryInitializationRunner
 import org.dolphinemu.dolphinemu.utils.DirectoryInitialization
 import org.dolphinemu.dolphinemu.utils.FileBrowserHelper
 import org.dolphinemu.dolphinemu.utils.RateLimiter
+import org.dolphinemu.dolphinemu.utils.Rg477mControllers
 import org.dolphinemu.dolphinemu.utils.ThemeHelper
 import kotlin.math.roundToInt
 
@@ -212,6 +213,8 @@ class EmulationActivity : AppCompatActivity(), ThemeProvider {
 
         settings = Settings()
         settings.loadSettings()
+
+        Rg477mControllers.apply(this, settings)
 
         // Set these options now so that the SurfaceView the game renders into is the right size.
         enableFullscreenImmersive()

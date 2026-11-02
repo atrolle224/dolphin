@@ -288,6 +288,12 @@ enum class BooleanSetting(
         "IRAlwaysRecenter",
         false
     ),
+    MAIN_COMBINE_CONTROLLERS(
+        Settings.FILE_DOLPHIN,
+        Settings.SECTION_INI_ANDROID,
+        "CombineControllers",
+        true
+    ),
     MAIN_BUTTON_TOGGLE_GC_0(
         Settings.FILE_DOLPHIN,
         Settings.SECTION_INI_ANDROID_OVERLAY_BUTTONS,

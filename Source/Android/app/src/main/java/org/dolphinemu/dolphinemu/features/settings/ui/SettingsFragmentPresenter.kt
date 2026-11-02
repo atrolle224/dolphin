@@ -1472,6 +1472,14 @@ class SettingsFragmentPresenter(
 
     private fun addGcPadSettings(sl: ArrayList<SettingsItem>) {
         sl.add(
+            SwitchSetting(
+                context,
+                BooleanSetting.MAIN_COMBINE_CONTROLLERS,
+                R.string.combine_controllers,
+                R.string.combine_controllers_description
+            )
+        )
+        sl.add(
             SingleChoiceSetting(
                 context,
                 IntSetting.MAIN_SI_DEVICE_0,
@@ -1518,6 +1526,14 @@ class SettingsFragmentPresenter(
     }
 
     private fun addWiimoteSettings(sl: ArrayList<SettingsItem>) {
+        sl.add(
+            SwitchSetting(
+                context,
+                BooleanSetting.MAIN_COMBINE_CONTROLLERS,
+                R.string.combine_controllers,
+                R.string.combine_controllers_description
+            )
+        )
         sl.add(
             SingleChoiceSetting(
                 context,

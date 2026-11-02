@@ -6,10 +6,12 @@
 #include <algorithm>
 #include <atomic>
 #include <chrono>
+#include <cmath>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 #include <fmt/format.h>
 
@@ -18,6 +20,7 @@
 #include <jni.h>
 
 #include "Common/Assert.h"
+#include "Common/Config/Config.h"
 #include "Common/Contains.h"
 #include "Common/Logging/Log.h"
 #include "Common/StringUtil.h"
@@ -676,6 +679,12 @@ public:
   }
 
   std::optional<jint> GetDeviceID() const { return m_device_id; }
+  // A controller (gamepad or joystick buttons/sticks), not a keyboard, touchscreen or sensors.
+  bool IsGameController() const
+  {
+    return m_device_id.has_value() &&
+           (m_source & (AINPUT_SOURCE_GAMEPAD | AINPUT_SOURCE_JOYSTICK)) != 0;
+  }
 
   jobject GetSensorEventListener() { return m_sensor_event_listener; }
 
@@ -1048,6 +1057,39 @@ void InputBackend::PopulateDevices()
 
 }  // namespace ciface::Android
 
+namespace
+{
+// RG477M build: every connected controller drives the others' Dolphin devices too, so a
+// handheld's own controls and an external controller both work for a port mapped to either
+// (Dolphin.ini [Android] CombineControllers, on by default; Settings → Controls).
+const Config::Info<bool> MAIN_ANDROID_COMBINE_CONTROLLERS{
+    {Config::System::Main, "Android", "CombineControllers"}, true};
+
+// The other connected controllers when the event's device is one and combining is on.
+std::vector<std::shared_ptr<ciface::Core::Device>>
+OtherControllers(const std::shared_ptr<ciface::Core::Device>& device)
+{
+  std::vector<std::shared_ptr<ciface::Core::Device>> out;
+  if (!Config::Get(MAIN_ANDROID_COMBINE_CONTROLLERS))
+    return out;
+  const auto* d = static_cast<const ciface::Android::AndroidDevice*>(device.get());
+  if (!d->IsGameController())
+    return out;
+  for (const auto& [id, qualifier] : s_device_id_to_device_qualifier)
+  {
+    if (id == *d->GetDeviceID())
+      continue;
+    std::shared_ptr<ciface::Core::Device> other = g_controller_interface.FindDevice(qualifier);
+    if (other && other->GetSource() == SOURCE &&
+        static_cast<const ciface::Android::AndroidDevice*>(other.get())->IsGameController())
+    {
+      out.push_back(std::move(other));
+    }
+  }
+  return out;
+}
+}  // namespace
+
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
@@ -1088,6 +1130,12 @@ Java_org_dolphinemu_dolphinemu_features_input_model_ControllerInterface_dispatch
   casted_input->SetState(state);
   const Clock::time_point last_polled = casted_input->GetLastPolled();
 
+  for (const auto& other : OtherControllers(device))
+  {
+    if (ciface::Core::Device::Input* o = other->FindInput(input_name))
+      static_cast<ciface::Android::AndroidInput*>(o)->SetState(state);
+  }
+
   DEBUG_LOG_FMT(CONTROLLERINTERFACE, "Set {} of {} to {}", input_name, device->GetQualifiedName(),
                 state);
 
@@ -1108,7 +1156,8 @@ Java_org_dolphinemu_dolphinemu_features_input_model_ControllerInterface_dispatch
 
   Clock::time_point last_polled{};
 
-  for (ciface::Core::Device::Input* input : device->Inputs())
+  auto apply = [&](const std::shared_ptr<ciface::Core::Device>& target, bool primary) {
+  for (ciface::Core::Device::Input* input : target->Inputs())
   {
     const std::string input_name = input->GetName();
     if (input_name.starts_with(axis_name_prefix))
@@ -1126,14 +1175,35 @@ Java_org_dolphinemu_dolphinemu_features_input_model_ControllerInterface_dispatch
 
       float value = env->CallFloatMethod(motion_event, s_motion_event_get_axis_value, axis_id);
 
+      // Mirrored to another controller (CombineControllers): an axis this controller leaves at
+      // rest is passed on once as it comes to rest and not after, so its resting jitter doesn't
+      // pull the other controller's stick back to the middle while that one is pushed.
+      if (!primary)
+      {
+        static std::unordered_map<long long, bool> s_axis_active;
+        const long long key = (static_cast<long long>(device_id) << 32) |
+                              static_cast<unsigned int>(axis_id * 2 + (input_name.back() == '+'));
+        const bool active = std::abs(value) >= 0.2f;
+        bool& was = s_axis_active[key];
+        const bool pass = active || was;
+        was = active;
+        if (!pass)
+          continue;
+      }
+
       auto casted_input = static_cast<ciface::Android::AndroidInput*>(input);
       casted_input->SetState(value);
-      last_polled = std::max(last_polled, casted_input->GetLastPolled());
+      if (primary)
+        last_polled = std::max(last_polled, casted_input->GetLastPolled());
 
       DEBUG_LOG_FMT(CONTROLLERINTERFACE, "Set {} of {} to {}", input_name,
-                    device->GetQualifiedName(), value);
+                    target->GetQualifiedName(), value);
     }
   }
+  };
+  apply(device, true);
+  for (const auto& other : OtherControllers(device))
+    apply(other, false);
 
   return last_polled >= Clock::now() - ACTIVE_INPUT_TIMEOUT;
 }

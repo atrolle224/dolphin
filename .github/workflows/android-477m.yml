@@ -56,8 +56,14 @@ jobs:
       - name: APK
         working-directory: Source/Android
         run: |
+          # CMake copies Data/Sys into the assets only when it configures, which the
+          # cached .cxx skips: copy it here so every APK carries Sys (GameCube fonts etc.)
+          mkdir -p app/src/main/assets
+          rm -rf app/src/main/assets/Sys
+          cp -r ../../Data/Sys app/src/main/assets/
           chmod +x gradlew
           ./gradlew --no-daemon assembleDebug
+          unzip -l app/build/outputs/apk/debug/*.apk | grep -E "assets/Sys/GC/font_(western|japanese).bin"
 
       - uses: actions/upload-artifact@v4
         with:

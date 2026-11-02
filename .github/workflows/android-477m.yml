@@ -21,6 +21,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
+
+      # Dolphin's version comes from `git describe`; without the release tags it is a bare
+      # hash, which RetroAchievements doesn't recognise as a supported Dolphin
+      - name: Release tags
+        run: git fetch --no-recurse-submodules --tags https://github.com/dolphin-emu/dolphin.git || true
 
       - uses: actions/setup-java@v4
         with:

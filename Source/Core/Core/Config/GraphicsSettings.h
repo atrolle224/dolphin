@@ -69,6 +69,7 @@ extern const Info<bool> GFX_SHADER_CACHE;
 extern const Info<bool> GFX_WAIT_FOR_SHADERS_BEFORE_STARTING;
 extern const Info<ShaderCompilationMode> GFX_SHADER_COMPILATION_MODE;
 extern const Info<int> GFX_SHADER_COMPILER_THREADS;
+extern const Info<bool> GFX_MALI_ALLOW_PRIMITIVE_RESTART;
 extern const Info<int> GFX_SHADER_PRECOMPILER_THREADS;
 extern const Info<bool> GFX_SAVE_TEXTURE_CACHE_TO_STATE;
 

@@ -158,7 +158,9 @@ public enum BooleanSetting implements AbstractBooleanSetting
   GFX_BACKEND_MULTITHREADING(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS,
           "BackendMultithreading", false),
   GFX_WAIT_FOR_SHADERS_BEFORE_STARTING(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS,
-          "WaitForShadersBeforeStarting", false),
+          "WaitForShadersBeforeStarting", true),
+  GFX_MALI_ALLOW_PRIMITIVE_RESTART(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS,
+          "MaliAllowPrimitiveRestart", false),
   GFX_SAVE_TEXTURE_CACHE_TO_STATE(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS,
           "SaveTextureCacheToState", true),
 

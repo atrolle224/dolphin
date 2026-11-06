@@ -201,7 +201,7 @@ enum class BBADeviceType
 {
   TAP,
   XLINK,
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__ANDROID__)
   TAPSERVER,
 #endif
 };
@@ -358,7 +358,7 @@ private:
 #endif
   };
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__ANDROID__)
   class TAPServerNetworkInterface : public TAPNetworkInterface
   {
   public:

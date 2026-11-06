@@ -1,0 +1,55 @@
+# Builds Dolphin MMJR2 477M (org.dolphinemu.mmjr.rg477m): Dolphin MMJR2 with the RG477M
+# defaults, arm64 only, signed with the RG477M ports key so updates install over it.
+name: Dolphin MMJR2 477M
+
+on:
+  push:
+    branches: [mmjr2-477m]
+  workflow_dispatch:
+
+concurrency:
+  group: mmjr2-477m-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: mGBA
+        run: git submodule update --init --depth 1 Externals/mGBA/mgba
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '11'
+
+      - name: Android SDK packages
+        run: |
+          set -e
+          sdkmanager=$(ls $ANDROID_HOME/cmdline-tools/*/bin/sdkmanager | head -1)
+          yes | $sdkmanager --licenses > /dev/null || true
+          $sdkmanager --install "ndk;21.4.7075529" "cmake;3.10.2.4988404" "platforms;android-31" "build-tools;30.0.3" > /dev/null
+
+      - name: Signing key
+        run: |
+          git clone -q --depth 1 --filter=blob:none --sparse https://github.com/atrolle224/GammaOSNext keys
+          git -C keys sparse-checkout set ports/keys
+          echo "RG477M_KEYSTORE=$PWD/keys/ports/keys/rg477m-ports.keystore" >> $GITHUB_ENV
+
+      - name: Build
+        working-directory: Source/Android
+        env:
+          RG477M_KEYSTORE_PASSWORD: android
+          RG477M_KEY_ALIAS: rg477m
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mmjr2-477m-arm64
+          path: Source/Android/app/build/outputs/apk/release/*.apk

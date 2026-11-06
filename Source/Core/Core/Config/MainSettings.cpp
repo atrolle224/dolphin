@@ -53,6 +53,8 @@ const Info<int> MAIN_SLOT_B{{System::Main, "Core", "SlotB"}, ExpansionInterface:
 const Info<int> MAIN_SERIAL_PORT_1{{System::Main, "Core", "SerialPort1"},
                                    ExpansionInterface::EXIDEVICE_NONE};
 const Info<std::string> MAIN_BBA_MAC{{System::Main, "Core", "BBA_MAC"}, ""};
+const Info<std::string> MAIN_BBA_TAPSERVER_DESTINATION{
+    {System::Main, "Core", "BBA_TAPSERVER_DESTINATION"}, "/tmp/dolphin-tap"};
 
 Info<u32> GetInfoForSIDevice(u32 channel)
 {

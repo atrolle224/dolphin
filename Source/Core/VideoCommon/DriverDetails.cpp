@@ -6,6 +6,8 @@
 #include "Common/Logging/LogManager.h"
 #include "VideoCommon/DriverDetails.h"
 
+#include "Core/Config/GraphicsSettings.h"
+
 namespace DriverDetails
 {
 struct BugInfo
@@ -179,6 +181,11 @@ void Init(API api, Vendor vendor, Driver driver, const double version, const Fam
       m_bugs.emplace(bug.m_bug, bug);
     }
   }
+
+  // Graphics > Advanced: "Mali: Allow Primitive Restart". The Arm entry is for all driver
+  // versions; a newer driver may not need it, and primitive restart saves draws.
+  if (m_vendor == VENDOR_ARM && Config::Get(Config::GFX_MALI_ALLOW_PRIMITIVE_RESTART))
+    m_bugs.erase(BUG_PRIMITIVE_RESTART);
 }
 
 bool HasBug(Bug bug)

@@ -2,10 +2,12 @@ apply plugin: 'com.android.application'
 
 def keystorePropertiesFile = rootProject.file("android/keystore.properties");
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+if (keystorePropertiesFile.exists())
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     compileSdkVersion 31
+    ndkVersion "21.4.7075529"
 
     compileOptions {
         // Flag to enable support for the new language APIs
@@ -26,7 +28,8 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.dolphinemu.mmjr"
+        // MMJR2 477M: its own app, beside Dolphin MMJR2 and Dolphin 477M
+        applicationId "org.dolphinemu.mmjr.rg477m"
         minSdkVersion 23
         targetSdkVersion 29
 
@@ -42,6 +45,11 @@ android {
                 storePassword keystoreProperties['storePassword']
                 keyAlias keystoreProperties['keyAlias']
                 keyPassword keystoreProperties['keyPassword']
+            } else if (System.getenv("RG477M_KEYSTORE")) {
+                storeFile file(System.getenv("RG477M_KEYSTORE"))
+                storePassword System.getenv("RG477M_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("RG477M_KEY_ALIAS")
+                keyPassword System.getenv("RG477M_KEYSTORE_PASSWORD")
             }
         }
     }
@@ -77,9 +85,7 @@ android {
                 arguments "-DANDROID_STL=c++_static", "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
                 // , "-DENABLE_GENERIC=ON"
 
-                abiFilters "arm64-v8a" //, "x86_64", "armeabi-v7a", "x86"
-
-                abiFilters "arm64-v8a", "x86_64" //, "armeabi-v7a", "x86"
+                abiFilters "arm64-v8a"
 
                 // Remove the line below if you want to build the C++ unit tests
                 targets "main"

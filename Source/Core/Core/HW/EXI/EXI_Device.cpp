@@ -135,7 +135,7 @@ std::unique_ptr<IEXIDevice> EXIDevice_Create(const TEXIDevices device_type, cons
     result = std::make_unique<CEXIETHERNET>(BBADeviceType::TAP);
     break;
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__ANDROID__)
   case EXIDEVICE_ETHTAPSERVER:
     result = std::make_unique<CEXIETHERNET>(BBADeviceType::TAPSERVER);
     break;

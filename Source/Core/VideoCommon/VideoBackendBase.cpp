@@ -235,9 +235,14 @@ const std::vector<std::unique_ptr<VideoBackendBase>>& VideoBackendBase::GetAvail
     }
     else
 #endif
+#ifdef ANDROID
+    // MMJR2 477M: Vulkan is the default backend on the RG477M's Mali GPU
+    backends.emplace(backends.begin(), std::make_unique<Vulkan::VideoBackend>());
+#else
     {
       backends.push_back(std::make_unique<Vulkan::VideoBackend>());
     }
+#endif
 #endif
 #ifdef HAS_OPENGL
     backends.push_back(std::make_unique<SW::VideoSoftware>());

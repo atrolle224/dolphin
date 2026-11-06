@@ -1,83 +1,138 @@
 // Copyright 2020 Dolphin Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include <cerrno>
+#include <cstring>
+
 #include <fcntl.h>
+#include <netdb.h>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <unistd.h>
 
 #include "Common/Logging/Log.h"
 #include "Common/StringUtil.h"
+#include "Core/Config/MainSettings.h"
 #include "Core/HW/EXI/EXI_Device.h"
 #include "Core/HW/EXI/EXI_DeviceEthernet.h"
 
 namespace ExpansionInterface
 {
-// This interface is only implemented on macOS, since macOS needs a replacement
-// for TunTap when the kernel extension is no longer supported. This interface
-// only appears in the menu on macOS, so on other platforms, it does nothing and
-// refuses to activate.
+// A tapserver: a local socket (a path, as on macOS) or a TCP server (host:port, such as an
+// online service's), which exchanges Ethernet frames, each after its 16-bit length.
 
-constexpr char socket_path[] = "/tmp/dolphin-tap";
+#ifndef MSG_NOSIGNAL
+#define MSG_NOSIGNAL 0
+#endif
+
+static int ConnectUnix(const std::string& path)
+{
+  sockaddr_un sun = {};
+  if (path.size() + 1 > sizeof(sun.sun_path))
+  {
+    ERROR_LOG_FMT(SP1, "tapserver socket path is too long: {}", path);
+    return -1;
+  }
+  sun.sun_family = AF_UNIX;
+  std::strcpy(sun.sun_path, path.c_str());
+
+  const int fd = socket(AF_UNIX, SOCK_STREAM, 0);
+  if (fd == -1)
+    return -1;
+  if (connect(fd, reinterpret_cast<sockaddr*>(&sun), sizeof(sun)) == -1)
+  {
+    close(fd);
+    return -1;
+  }
+  return fd;
+}
+
+static int ConnectTcp(const std::string& host, const std::string& port)
+{
+  addrinfo hints = {};
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  addrinfo* found = nullptr;
+  if (getaddrinfo(host.c_str(), port.c_str(), &hints, &found) != 0)
+    return -1;
+
+  int fd = -1;
+  for (addrinfo* ai = found; ai && fd == -1; ai = ai->ai_next)
+  {
+    fd = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol);
+    if (fd != -1 && connect(fd, ai->ai_addr, ai->ai_addrlen) == -1)
+    {
+      close(fd);
+      fd = -1;
+    }
+  }
+  freeaddrinfo(found);
+  return fd;
+}
+
+// TCP may deliver a frame in pieces
+static bool ReadExact(int fd, u8* buffer, size_t size)
+{
+  while (size > 0)
+  {
+    const ssize_t n = read(fd, buffer, size);
+    if (n <= 0)
+      return false;
+    buffer += n;
+    size -= n;
+  }
+  return true;
+}
+
+static bool WriteAll(int fd, const u8* buffer, size_t size)
+{
+  while (size > 0)
+  {
+    const ssize_t n = send(fd, buffer, size, MSG_NOSIGNAL);
+    if (n <= 0)
+      return false;
+    buffer += n;
+    size -= n;
+  }
+  return true;
+}
 
 bool CEXIETHERNET::TAPServerNetworkInterface::Activate()
 {
   if (IsActivated())
     return true;
 
-  sockaddr_un sun = {};
-  if (sizeof(socket_path) > sizeof(sun.sun_path))
-  {
-    ERROR_LOG(SP1, "Socket path is too long, unable to init BBA");
-    return false;
-  }
-  sun.sun_family = AF_UNIX;
-  strcpy(sun.sun_path, socket_path);
+  const std::string destination = Config::Get(Config::MAIN_BBA_TAPSERVER_DESTINATION);
+  const size_t colon = destination.rfind(':');
+  if (destination.empty() || destination[0] == '/' || colon == std::string::npos)
+    fd = ConnectUnix(destination);
+  else
+    fd = ConnectTcp(destination.substr(0, colon), destination.substr(colon + 1));
 
-  fd = socket(AF_UNIX, SOCK_STREAM, 0);
   if (fd == -1)
   {
-    ERROR_LOG(SP1, "Couldn't create socket, unable to init BBA");
+    ERROR_LOG_FMT(SP1, "Couldn't connect to tapserver {} ({}), unable to init BBA", destination,
+                  errno);
     return false;
   }
 
-  if (connect(fd, reinterpret_cast<sockaddr*>(&sun), sizeof(sun)) == -1)
-  {
-    ERROR_LOG(SP1, "Couldn't connect socket (%d), unable to init BBA", errno);
-    close(fd);
-    fd = -1;
-    return false;
-  }
-
-  INFO_LOG(SP1, "BBA initialized.\n");
+  INFO_LOG_FMT(SP1, "BBA initialized with tapserver {}", destination);
   return RecvInit();
 }
 
 bool CEXIETHERNET::TAPServerNetworkInterface::SendFrame(const u8* frame, u32 size)
 {
-  {
-    const std::string s = ArrayToString(frame, size, 0x10);
-    INFO_LOG(SP1, "SendFrame %x\n%s\n", size, s.c_str());
-  }
+  DEBUG_LOG_FMT(SP1, "SendFrame {:x}\n{}", size, ArrayToString(frame, size, 0x10));
 
-  auto size16 = u16(size);
-  if (write(fd, &size16, 2) != 2)
+  const u16 size16 = u16(size);
+  if (!WriteAll(fd, reinterpret_cast<const u8*>(&size16), 2) || !WriteAll(fd, frame, size))
   {
-    ERROR_LOG(SP1, "SendFrame(): could not write size field\n");
+    ERROR_LOG_FMT(SP1, "SendFrame(): could not write a frame of {} bytes, err={}", size, errno);
     return false;
   }
-  int written_bytes = write(fd, frame, size);
-  if (u32(written_bytes) != size)
-  {
-    ERROR_LOG(SP1, "SendFrame(): expected to write %d bytes, instead wrote %d", size,
-              written_bytes);
-    return false;
-  }
-  else
-  {
-    m_eth_ref->SendComplete();
-    return true;
-  }
+  m_eth_ref->SendComplete();
+  return true;
 }
 
 void CEXIETHERNET::TAPServerNetworkInterface::ReadThreadHandler()
@@ -95,24 +150,21 @@ void CEXIETHERNET::TAPServerNetworkInterface::ReadThreadHandler()
       continue;
 
     u16 size;
-    if (read(fd, &size, 2) != 2)
+    if (!ReadExact(fd, reinterpret_cast<u8*>(&size), 2) || size > BBA_RECV_SIZE)
     {
-      ERROR_LOG(SP1, "Failed to read size field from BBA, err=%d", errno);
+      ERROR_LOG_FMT(SP1, "Failed to read a frame size from the tapserver, err={}", errno);
+      break;
     }
-    else
+    if (!ReadExact(fd, m_eth_ref->mRecvBuffer.get(), size))
     {
-      int read_bytes = read(fd, m_eth_ref->mRecvBuffer.get(), size);
-      if (read_bytes < 0)
-      {
-        ERROR_LOG(SP1, "Failed to read packet data from BBA, err=%d", errno);
-      }
-      else if (readEnabled.IsSet())
-      {
-        std::string data_string = ArrayToString(m_eth_ref->mRecvBuffer.get(), read_bytes, 0x10);
-        INFO_LOG(SP1, "Read data: %s", data_string.c_str());
-        m_eth_ref->mRecvBufferLength = read_bytes;
-        m_eth_ref->RecvHandlePacket();
-      }
+      ERROR_LOG_FMT(SP1, "Failed to read frame data from the tapserver, err={}", errno);
+      break;
+    }
+    if (readEnabled.IsSet())
+    {
+      DEBUG_LOG_FMT(SP1, "Read data: {}", ArrayToString(m_eth_ref->mRecvBuffer.get(), size, 0x10));
+      m_eth_ref->mRecvBufferLength = size;
+      m_eth_ref->RecvHandlePacket();
     }
   }
 }

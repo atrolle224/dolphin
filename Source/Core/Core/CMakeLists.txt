@@ -649,7 +649,7 @@ if(WIN32)
 elseif(APPLE)
   target_sources(core PRIVATE
     HW/EXI/BBA/TAP_Apple.cpp
-    HW/EXI/BBA/TAPServer_Apple.cpp
+    HW/EXI/BBA/TAPServer.cpp
     HW/EXI/BBA/XLINK_KAI_BBA.cpp
   )
   target_link_libraries(core PUBLIC ${IOB_LIBRARY})
@@ -660,6 +660,7 @@ elseif(UNIX)
   )
   if(ANDROID)
     target_sources(core PRIVATE
+      HW/EXI/BBA/TAPServer.cpp
       HW/WiimoteReal/IOAndroid.cpp
       HW/WiimoteReal/IOAndroid.h
     )

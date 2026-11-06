@@ -42,13 +42,13 @@ public enum IntSetting implements AbstractIntSetting
   SYSCONF_SENSOR_BAR_SENSITIVITY(Settings.FILE_SYSCONF, "BT", "SENS", 0x03),
   SYSCONF_SPEAKER_VOLUME(Settings.FILE_SYSCONF, "BT", "SPKV", 0x58),
 
-  GFX_ASPECT_RATIO(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS, "AspectRatio", 3),
+  GFX_ASPECT_RATIO(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS, "AspectRatio", 0),
   GFX_SAFE_TEXTURE_CACHE_COLOR_SAMPLES(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS,
           "SafeTextureCacheColorSamples", 128),
   GFX_MSAA(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS, "MSAA", 1),
-  GFX_EFB_SCALE(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS, "InternalResolution", 100),
+  GFX_EFB_SCALE(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS, "InternalResolution", 200),
   GFX_SHADER_COMPILATION_MODE(Settings.FILE_GFX, Settings.SECTION_GFX_SETTINGS,
-          "ShaderCompilationMode", 0),
+          "ShaderCompilationMode", 3),
 
   GFX_ENHANCE_MAX_ANISOTROPY(Settings.FILE_GFX, Settings.SECTION_GFX_ENHANCEMENTS, "MaxAnisotropy",
           0),

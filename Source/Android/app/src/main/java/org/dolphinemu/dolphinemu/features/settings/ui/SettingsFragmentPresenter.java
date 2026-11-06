@@ -626,6 +626,8 @@ public final class SettingsFragmentPresenter
             R.array.shaderCompilationDescriptionValues));
     sl.add(new CheckBoxSetting(mContext, BooleanSetting.GFX_WAIT_FOR_SHADERS_BEFORE_STARTING,
             R.string.wait_for_shaders, R.string.wait_for_shaders_description));
+    sl.add(new CheckBoxSetting(mContext, BooleanSetting.GFX_MALI_ALLOW_PRIMITIVE_RESTART,
+            R.string.mali_allow_primitive_restart, R.string.mali_allow_primitive_restart_description));
     sl.add(new SingleChoiceSetting(mContext, IntSetting.GFX_ASPECT_RATIO, R.string.aspect_ratio, 0,
             R.array.aspectRatioEntries, R.array.aspectRatioValues));
     sl.add(new PercentSliderSetting(mContext, FloatSetting.GFX_DISPLAY_SCALE, R.string.setting_display_scale,

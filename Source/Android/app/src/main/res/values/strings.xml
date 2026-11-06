@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Title of the app -->
-    <string name="app_name">Dolphin |MMJR2|</string>
+    <string name="app_name">Dolphin MMJR2 477M</string>
     <string name="host">app</string>
     <string name="scheme">dolphinemu</string>
 
@@ -551,4 +551,6 @@ It can efficiently compress both junk data and encrypted Wii data.
     <string name="enable_cheats_description">Put AR &amp; Gecko Codes in game setting file.</string>
     <string name="make_sure_continuous_scan_enabled">Please make sure Continuous Scanning is enabled in Core Settings.</string>
 
+    <string name="mali_allow_primitive_restart">Mali: Allow Primitive Restart</string>
+    <string name="mali_allow_primitive_restart_description">Turns off Dolphin\'s workaround for a primitive restart bug in older Mali drivers, which saves draw calls. Turn it off again if graphics break.</string>
 </resources>

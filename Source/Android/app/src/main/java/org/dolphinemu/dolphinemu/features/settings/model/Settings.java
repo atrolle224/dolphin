@@ -39,6 +39,7 @@ public class Settings implements Closeable
   public static final String SECTION_INI_CORE = "Core";
   public static final String SECTION_INI_INTERFACE = "Interface";
   public static final String SECTION_INI_DSP = "DSP";
+  public static final String SECTION_ACHIEVEMENTS = "Achievements";
 
   public static final String SECTION_LOGGER_LOGS = "Logs";
   public static final String SECTION_LOGGER_OPTIONS = "Options";

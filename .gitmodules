@@ -8,3 +8,6 @@
 	url = https://github.com/mgba-emu/mgba.git
 	branch = master
 	shallow = true
+[submodule "Externals/rcheevos/rcheevos"]
+	path = Externals/rcheevos/rcheevos
+	url = https://github.com/RetroAchievements/rcheevos.git

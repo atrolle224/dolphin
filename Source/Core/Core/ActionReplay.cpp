@@ -18,6 +18,7 @@
 // copy, etc
 // -------------------------------------------------------------------------------------------------------------
 
+#include "Core/AchievementManager.h"
 #include "Core/ActionReplay.h"
 
 #include <algorithm>
@@ -973,7 +974,7 @@ static bool RunCodeLocked(const ARCode& arcode)
 
 void RunAllActive()
 {
-  if (!Config::Get(Config::MAIN_ENABLE_CHEATS))
+  if (!Config::Get(Config::MAIN_ENABLE_CHEATS) || AchievementManager::GetInstance().IsHardcoreModeActive())
     return;
 
   // If the mutex is idle then acquiring it should be cheap, fast mutexes

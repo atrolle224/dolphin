@@ -3,6 +3,8 @@
 
 #include "Core/State.h"
 
+#include "Core/AchievementManager.h"
+
 #include <lzo/lzo1x.h>
 #include <map>
 #include <mutex>
@@ -557,6 +559,11 @@ void LoadAs(const std::string& filename)
   else if (NetPlay::IsNetPlayRunning())
   {
     OSD::AddMessage("Loading savestates is disabled in Netplay to prevent desyncs");
+    return;
+  }
+  else if (AchievementManager::GetInstance().IsHardcoreModeActive())
+  {
+    OSD::AddMessage("Loading savestates is disabled in RetroAchievements hardcore mode");
     return;
   }
 

@@ -1,4 +1,6 @@
 add_library(core
+  AchievementManager.cpp
+  AchievementManager.h
   ActionReplay.cpp
   ActionReplay.h
   ARDecrypt.cpp
@@ -18,6 +20,8 @@ add_library(core
   CommonTitles.h
   Config/DefaultLocale.cpp
   Config/DefaultLocale.h
+  Config/AchievementSettings.cpp
+  Config/AchievementSettings.h
   Config/FreeLookSettings.cpp
   Config/FreeLookSettings.h
   Config/GraphicsSettings.cpp
@@ -566,6 +570,7 @@ endif()
 target_link_libraries(core
 PUBLIC
   audiocommon
+  rcheevos
   common
   cubeb
   discio

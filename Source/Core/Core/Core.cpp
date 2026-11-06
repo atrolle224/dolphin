@@ -3,6 +3,8 @@
 
 #include "Core/Core.h"
 
+#include "Core/AchievementManager.h"
+
 #include <algorithm>
 #include <atomic>
 #include <cstring>
@@ -276,6 +278,8 @@ void Stop()  // - Hammertime!
 {
   if (GetState() == State::Stopping || GetState() == State::Uninitialized)
     return;
+
+  AchievementManager::GetInstance().CloseGame();
 
   const SConfig& _CoreParameter = SConfig::GetInstance();
 
@@ -916,6 +920,8 @@ void Callback_NewField()
       CallOnStateChangedCallbacks(Core::GetState());
     }
   }
+
+  AchievementManager::GetInstance().DoFrame();
 }
 
 const PerformanceStatistics& GetPerformanceStatistics()

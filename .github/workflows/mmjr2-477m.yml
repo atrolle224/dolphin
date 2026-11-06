@@ -19,8 +19,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: mGBA
-        run: git submodule update --init --depth 1 Externals/mGBA/mgba
+      - name: Submodules
+        run: git submodule update --init --depth 1 Externals/mGBA/mgba Externals/rcheevos/rcheevos
 
       - uses: actions/setup-java@v4
         with:

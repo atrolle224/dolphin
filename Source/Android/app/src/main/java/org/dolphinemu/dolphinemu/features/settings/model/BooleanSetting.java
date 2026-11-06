@@ -33,6 +33,9 @@ public enum BooleanSetting implements AbstractBooleanSetting
           true),
   MAIN_ENABLE_CHEATS(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "EnableCheats",
     false),
+  MAIN_RA_ENABLED(Settings.FILE_DOLPHIN, Settings.SECTION_ACHIEVEMENTS, "Enabled", true),
+  MAIN_RA_HARDCORE(Settings.FILE_DOLPHIN, Settings.SECTION_ACHIEVEMENTS, "HardcoreEnabled",
+          false),
 
   MAIN_DSP_JIT(Settings.FILE_DOLPHIN, Settings.SECTION_INI_DSP, "EnableJIT", true),
 

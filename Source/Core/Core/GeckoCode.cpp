@@ -1,6 +1,7 @@
 // Copyright 2010 Dolphin Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "Core/AchievementManager.h"
 #include "Core/GeckoCode.h"
 
 #include <algorithm>
@@ -233,7 +234,7 @@ void Shutdown()
 
 void RunCodeHandler()
 {
-  if (!Config::Get(Config::MAIN_ENABLE_CHEATS))
+  if (!Config::Get(Config::MAIN_ENABLE_CHEATS) || AchievementManager::GetInstance().IsHardcoreModeActive())
     return;
 
   // NOTE: Need to release the lock because of GUI deadlocks with PanicAlert in HostWrite_*

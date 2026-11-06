@@ -548,6 +548,19 @@ It can efficiently compress both junk data and encrypted Wii data.
     <string name="cheat_load">Cheat Load</string>
     <string name="toast_save_code_no">Save Failed!</string>
     <string name="toggle_list">Cheat Editor</string>
+    <string name="ra_header">RetroAchievements</string>
+    <string name="ra_account">RetroAchievements Account</string>
+    <string name="ra_account_description">Sign in or out. Only the login token is saved, never the password.</string>
+    <string name="ra_enabled">Enable RetroAchievements</string>
+    <string name="ra_enabled_description">Track achievements when a game starts.</string>
+    <string name="ra_hardcore">Hardcore Mode</string>
+    <string name="ra_hardcore_description">Counts on the hardcore leaderboard. Loading states and cheats are blocked.</string>
+    <string name="ra_username">Username</string>
+    <string name="ra_password">Password</string>
+    <string name="ra_sign_in">Sign In</string>
+    <string name="ra_sign_out">Sign Out</string>
+    <string name="ra_signed_in_as">Signed in as %1$s</string>
+    <string name="ra_signed_out">Signed out of RetroAchievements</string>
     <string name="enable_cheats_description">Put AR &amp; Gecko Codes in game setting file.</string>
     <string name="make_sure_continuous_scan_enabled">Please make sure Continuous Scanning is enabled in Core Settings.</string>
 

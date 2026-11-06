@@ -282,6 +282,14 @@ public final class SettingsFragmentPresenter
             R.string.fallback_region, 0, R.array.regionEntries, R.array.regionValues));
     sl.add(new CheckBoxSetting(mContext, BooleanSetting.MAIN_ENABLE_SAVESTATES,
             R.string.enable_save_states, R.string.enable_save_states_description));
+
+    sl.add(new HeaderSetting(mContext, R.string.ra_header, 0));
+    sl.add(new RunRunnable(mContext, R.string.ra_account, R.string.ra_account_description, 0, 0,
+            () -> RetroAchievementsDialog.show(mContext)));
+    sl.add(new CheckBoxSetting(mContext, BooleanSetting.MAIN_RA_ENABLED, R.string.ra_enabled,
+            R.string.ra_enabled_description));
+    sl.add(new CheckBoxSetting(mContext, BooleanSetting.MAIN_RA_HARDCORE, R.string.ra_hardcore,
+            R.string.ra_hardcore_description));
   }
 
   private void addInterfaceSettings(ArrayList<SettingsItem> sl)

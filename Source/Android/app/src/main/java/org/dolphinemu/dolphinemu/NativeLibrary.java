@@ -325,6 +325,18 @@ public final class NativeLibrary
   public static native String GetGitRevision();
 
   /**
+   * Signs in to RetroAchievements. Blocks on the network; only the login token is kept.
+   *
+   * @return "" on success, otherwise the error.
+   */
+  public static native String RetroAchievementsLogin(String username, String password);
+
+  public static native void RetroAchievementsLogout();
+
+  /** @return the signed-in RetroAchievements user, or "". */
+  public static native String RetroAchievementsGetUser();
+
+  /**
    * Saves a screen capture of the game
    */
   public static native void SaveScreenShot();

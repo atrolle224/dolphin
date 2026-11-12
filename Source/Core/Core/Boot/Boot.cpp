@@ -3,8 +3,6 @@
 
 #include "Core/Boot/Boot.h"
 
-#include "Core/AchievementManager.h"
-
 #ifdef _MSC_VER
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -438,7 +436,6 @@ bool CBoot::BootUp(std::unique_ptr<BootParameters> boot)
         return false;
 
       SConfig::OnNewTitleLoad();
-      AchievementManager::GetInstance().LoadGame(disc.path, config.bWii);
       return true;
     }
 

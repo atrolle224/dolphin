@@ -30,7 +30,6 @@
 #include "Common/Version.h"
 #include "Common/WindowSystemInfo.h"
 
-#include "Core/AchievementManager.h"
 #include "Core/Boot/Boot.h"
 #include "Core/BootManager.h"
 #include "Core/ConfigLoaders/GameConfigLoader.h"
@@ -798,24 +797,5 @@ Java_org_dolphinemu_dolphinemu_NativeLibrary_setNativeTheme(JNIEnv* env, jclass,
     const char *themeString = env->GetStringUTFChars(theme, nullptr);
     AndroidTheme::Set(themeString);
     env->ReleaseStringUTFChars(theme, themeString);
-}
-
-JNIEXPORT jstring JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_RetroAchievementsLogin(
-    JNIEnv* env, jclass, jstring username, jstring password)
-{
-  return ToJString(env, AchievementManager::GetInstance().Login(GetJString(env, username),
-                                                               GetJString(env, password)));
-}
-
-JNIEXPORT void JNICALL
-Java_org_dolphinemu_dolphinemu_NativeLibrary_RetroAchievementsLogout(JNIEnv*, jclass)
-{
-  AchievementManager::GetInstance().Logout();
-}
-
-JNIEXPORT jstring JNICALL
-Java_org_dolphinemu_dolphinemu_NativeLibrary_RetroAchievementsGetUser(JNIEnv* env, jclass)
-{
-  return ToJString(env, AchievementManager::GetInstance().GetUsername());
 }
 }

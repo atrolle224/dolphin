@@ -830,8 +830,6 @@ endif()
 if(NOT ENABLE_QT)
   set(USE_MGBA 0)
 endif()
-add_subdirectory(Externals/rcheevos)
-
 if(USE_MGBA)
   message(STATUS "Using static libmgba from Externals")
   add_subdirectory(Externals/mGBA)

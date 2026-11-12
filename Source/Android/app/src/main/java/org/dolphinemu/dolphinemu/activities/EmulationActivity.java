@@ -51,6 +51,7 @@ import org.dolphinemu.dolphinemu.overlay.InputOverlayPointer;
 import org.dolphinemu.dolphinemu.ui.main.MainPresenter;
 import org.dolphinemu.dolphinemu.utils.AfterDirectoryInitializationRunner;
 import org.dolphinemu.dolphinemu.utils.ControllerMappingHelper;
+import org.dolphinemu.dolphinemu.utils.PadNormalizer;
 import org.dolphinemu.dolphinemu.utils.FileBrowserHelper;
 import org.dolphinemu.dolphinemu.utils.IniFile;
 import org.dolphinemu.dolphinemu.utils.MotionListener;
@@ -251,7 +252,9 @@ public final class EmulationActivity extends AppCompatActivity
   {
     File wiimoteNewFile = SettingsFile.getSettingsFile(Settings.FILE_WIIMOTE);
     IniFile wiimoteNewIni = new IniFile(wiimoteNewFile);
-    wiimoteNewIni.setBoolean("Wiimote1", "IMUIR/Enabled", value != 1);
+    // Only "Use Device Sensors (With Pointer Emulation)" points with them; otherwise the IR
+    // bindings (the right stick) do
+    wiimoteNewIni.setBoolean("Wiimote1", "IMUIR/Enabled", value == 0);
     wiimoteNewIni.save(wiimoteNewFile);
   }
 
@@ -770,6 +773,8 @@ public final class EmulationActivity extends AppCompatActivity
         return false;
     }
     InputDevice input = event.getDevice();
+    if (event.getRepeatCount() == 0)
+      PadNormalizer.onKey(input, event.getKeyCode(), action == NativeLibrary.ButtonState.PRESSED);
     return NativeLibrary.onGamePadEvent(input.getDescriptor(), event.getKeyCode(), action);
   }
 
@@ -1254,14 +1259,10 @@ public final class EmulationActivity extends AppCompatActivity
       float value = ControllerMappingHelper.scaleAxis(input, axis, origValue);
       // If the input is still in the "flat" area, that means it's really zero.
       // This is used to compensate for imprecision in joysticks.
-      if (Math.abs(value) > range.getFlat())
-      {
-        NativeLibrary.onGamePadMoveEvent(input.getDescriptor(), axis, value);
-      }
-      else
-      {
-        NativeLibrary.onGamePadMoveEvent(input.getDescriptor(), axis, 0.0f);
-      }
+      if (Math.abs(value) <= range.getFlat())
+        value = 0.0f;
+      NativeLibrary.onGamePadMoveEvent(input.getDescriptor(), axis, value);
+      PadNormalizer.onAxis(input, axis, value);
     }
 
     return true;

@@ -57,8 +57,9 @@ public enum BooleanSetting implements AbstractBooleanSetting
           "JoystickRelCenter", true),
   MAIN_PHONE_RUMBLE(Settings.FILE_DOLPHIN, Settings.SECTION_INI_ANDROID,
           "PhoneRumble", true),
+  // RG477M: built-in controls; the on-screen ones stay a menu toggle away
   MAIN_SHOW_INPUT_OVERLAY(Settings.FILE_DOLPHIN, Settings.SECTION_INI_ANDROID,
-          "ShowInputOverlay", true),
+          "ShowInputOverlay", false),
 
   UPDATER_CHECK_AT_STARTUP(Settings.FILE_DOLPHIN, Settings.SECTION_INI_ANDROID,
           "UpdaterCheckAtStartup", false),

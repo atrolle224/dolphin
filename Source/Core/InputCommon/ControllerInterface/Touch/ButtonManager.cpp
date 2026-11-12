@@ -385,6 +385,100 @@ void AddBind(const std::string& dev, sBind* bind)
 }
 }  // Anonymous namespace
 
+// RG477M: a profile for controllers with no bindings of their own (the RG477M's built-in pad in
+// Xbox mode, 8BitDo and other Xbox-layout pads): Android key codes and axes, the triggers as
+// AXIS_LTRIGGER/RTRIGGER, the right stick as AXIS_Z/RZ and the D-pad as the hat axes
+// (PadNormalizer sends those for pads that report them otherwise).
+const std::string DEFAULT_PAD_KEY = "rg477m-default-pad";
+
+static void AddDefaultPadBindings()
+{
+  enum
+  {
+    KEY_A = 96, KEY_B = 97, KEY_X = 99, KEY_Y = 100, KEY_L1 = 102, KEY_R1 = 103,
+    KEY_THUMBL = 106, KEY_THUMBR = 107, KEY_START = 108, KEY_SELECT = 109,
+    AX_X = 0, AX_Y = 1, AX_Z = 11, AX_RZ = 14, AX_HAT_X = 15, AX_HAT_Y = 16,
+    AX_LTRIGGER = 17, AX_RTRIGGER = 18
+  };
+  const auto button = [](int pad, ButtonType type, int key) {
+    AddBind(DEFAULT_PAD_KEY, new sBind(pad, type, BIND_BUTTON, key, 1.0f));
+  };
+  const auto axis = [](int pad, ButtonType type, int ax, float dir) {
+    AddBind(DEFAULT_PAD_KEY, new sBind(pad, type, BIND_AXIS, ax, dir));
+  };
+  const auto stick = [&axis](int pad, ButtonType up, ButtonType down, ButtonType left,
+                             ButtonType right, int ax_x, int ax_y) {
+    axis(pad, up, ax_y, -1.0f);
+    axis(pad, down, ax_y, 1.0f);
+    axis(pad, left, ax_x, -1.0f);
+    axis(pad, right, ax_x, 1.0f);
+  };
+
+  // GameCube controller 1: A B X Y by name, Z on R1, L/R on the triggers, C-stick on the right
+  // stick, D-pad on the D-pad
+  button(0, BUTTON_A, KEY_A);
+  button(0, BUTTON_B, KEY_B);
+  button(0, BUTTON_X, KEY_X);
+  button(0, BUTTON_Y, KEY_Y);
+  button(0, BUTTON_Z, KEY_R1);
+  button(0, BUTTON_START, KEY_START);
+  axis(0, BUTTON_UP, AX_HAT_Y, -1.0f);
+  axis(0, BUTTON_DOWN, AX_HAT_Y, 1.0f);
+  axis(0, BUTTON_LEFT, AX_HAT_X, -1.0f);
+  axis(0, BUTTON_RIGHT, AX_HAT_X, 1.0f);
+  stick(0, STICK_MAIN_UP, STICK_MAIN_DOWN, STICK_MAIN_LEFT, STICK_MAIN_RIGHT, AX_X, AX_Y);
+  stick(0, STICK_C_UP, STICK_C_DOWN, STICK_C_LEFT, STICK_C_RIGHT, AX_Z, AX_RZ);
+  axis(0, TRIGGER_L, AX_LTRIGGER, 1.0f);
+  axis(0, TRIGGER_R, AX_RTRIGGER, 1.0f);
+  axis(0, TRIGGER_L_ANALOG, AX_LTRIGGER, 1.0f);
+  axis(0, TRIGGER_R_ANALOG, AX_RTRIGGER, 1.0f);
+
+  // Wii Remote 1 with Nunchuk: A on A, B on R2, 1/2 on X/Y, -/+ on Select/Start, Home on L3,
+  // the pointer on the right stick (R3 hides it), shake on R1; Nunchuk stick on the left stick,
+  // C on L1, Z on L2
+  button(4, WIIMOTE_BUTTON_A, KEY_A);
+  axis(4, WIIMOTE_BUTTON_B, AX_RTRIGGER, 1.0f);
+  button(4, WIIMOTE_BUTTON_1, KEY_X);
+  button(4, WIIMOTE_BUTTON_2, KEY_Y);
+  button(4, WIIMOTE_BUTTON_MINUS, KEY_SELECT);
+  button(4, WIIMOTE_BUTTON_PLUS, KEY_START);
+  button(4, WIIMOTE_BUTTON_HOME, KEY_THUMBL);
+  axis(4, WIIMOTE_UP, AX_HAT_Y, -1.0f);
+  axis(4, WIIMOTE_DOWN, AX_HAT_Y, 1.0f);
+  axis(4, WIIMOTE_LEFT, AX_HAT_X, -1.0f);
+  axis(4, WIIMOTE_RIGHT, AX_HAT_X, 1.0f);
+  stick(4, WIIMOTE_IR_UP, WIIMOTE_IR_DOWN, WIIMOTE_IR_LEFT, WIIMOTE_IR_RIGHT, AX_Z, AX_RZ);
+  button(4, WIIMOTE_IR_HIDE, KEY_THUMBR);
+  button(4, WIIMOTE_SHAKE_X, KEY_R1);
+  button(4, WIIMOTE_SHAKE_Y, KEY_R1);
+  button(4, WIIMOTE_SHAKE_Z, KEY_R1);
+  button(4, NUNCHUK_BUTTON_C, KEY_L1);
+  axis(4, NUNCHUK_BUTTON_Z, AX_LTRIGGER, 1.0f);
+  stick(4, NUNCHUK_STICK_UP, NUNCHUK_STICK_DOWN, NUNCHUK_STICK_LEFT, NUNCHUK_STICK_RIGHT, AX_X,
+        AX_Y);
+
+  // Classic Controller (for games that use it): by name, ZL/ZR on L1/R1, L/R on the triggers
+  button(4, CLASSIC_BUTTON_A, KEY_A);
+  button(4, CLASSIC_BUTTON_B, KEY_B);
+  button(4, CLASSIC_BUTTON_X, KEY_X);
+  button(4, CLASSIC_BUTTON_Y, KEY_Y);
+  button(4, CLASSIC_BUTTON_MINUS, KEY_SELECT);
+  button(4, CLASSIC_BUTTON_PLUS, KEY_START);
+  button(4, CLASSIC_BUTTON_HOME, KEY_THUMBL);
+  button(4, CLASSIC_BUTTON_ZL, KEY_L1);
+  button(4, CLASSIC_BUTTON_ZR, KEY_R1);
+  axis(4, CLASSIC_DPAD_UP, AX_HAT_Y, -1.0f);
+  axis(4, CLASSIC_DPAD_DOWN, AX_HAT_Y, 1.0f);
+  axis(4, CLASSIC_DPAD_LEFT, AX_HAT_X, -1.0f);
+  axis(4, CLASSIC_DPAD_RIGHT, AX_HAT_X, 1.0f);
+  stick(4, CLASSIC_STICK_LEFT_UP, CLASSIC_STICK_LEFT_DOWN, CLASSIC_STICK_LEFT_LEFT,
+        CLASSIC_STICK_LEFT_RIGHT, AX_X, AX_Y);
+  stick(4, CLASSIC_STICK_RIGHT_UP, CLASSIC_STICK_RIGHT_DOWN, CLASSIC_STICK_RIGHT_LEFT,
+        CLASSIC_STICK_RIGHT_RIGHT, AX_Z, AX_RZ);
+  axis(4, CLASSIC_TRIGGER_L, AX_LTRIGGER, 1.0f);
+  axis(4, CLASSIC_TRIGGER_R, AX_RTRIGGER, 1.0f);
+}
+
 void Init(const std::string& game_id)
 {
   // Initialize pad 0(gc 1) and pad 4(wii 1) as touch overlay controller
@@ -681,6 +775,16 @@ void Init(const std::string& game_id)
                 new sBind(pad_id, CONFIG_TYPES[a], type, bindnum, modifier == '-' ? -1.0f : 1.0f));
     }
   }
+  AddDefaultPadBindings();
+}
+
+// A controller mapped in the settings uses its own bindings; any other uses the RG477M profile.
+static InputDevice* PadFor(const std::string& dev)
+{
+  auto it = m_controllers.find(dev);
+  if (it == m_controllers.end())
+    it = m_controllers.find(DEFAULT_PAD_KEY);
+  return it == m_controllers.end() ? nullptr : it->second;
 }
 
 bool GetButtonPressed(int pad_id, ButtonType button)
@@ -744,17 +848,14 @@ double GetInputRadiusAtAngle(int pad_id, ButtonType stick, double angle)
 
 bool GamepadEvent(const std::string& dev, int button, int action)
 {
-  auto it = m_controllers.find(dev);
-  if (it != m_controllers.end())
-    return it->second->PressEvent(button, action);
-  return false;
+  InputDevice* pad = PadFor(dev);
+  return pad && pad->PressEvent(button, action);
 }
 
 void GamepadAxisEvent(const std::string& dev, int axis, float value)
 {
-  auto it = m_controllers.find(dev);
-  if (it != m_controllers.end())
-    it->second->AxisEvent(axis, value);
+  if (InputDevice* pad = PadFor(dev))
+    pad->AxisEvent(axis, value);
 }
 
 void Shutdown()

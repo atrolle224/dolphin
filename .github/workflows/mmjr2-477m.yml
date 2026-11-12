@@ -4,8 +4,11 @@ name: Dolphin MMJR2 477M
 
 on:
   push:
-    branches: [mmjr2-477m]
+    branches: [mmjr2-477m, mmjr2-477m-*]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 concurrency:
   group: mmjr2-477m-${{ github.ref }}
@@ -53,3 +56,13 @@ jobs:
         with:
           name: mmjr2-477m-arm64
           path: Source/Android/app/build/outputs/apk/release/*.apk
+
+      # a draft release keeps a test build of another branch downloadable too
+      - name: Draft release
+        if: github.ref_name != 'mmjr2-477m'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "build-${{ github.ref_name }}-${{ github.run_id }}" --draft \
+            --target "${{ github.sha }}" --title "MMJR2 477M ${{ github.ref_name }}" \
+            --notes "Test build of ${{ github.ref_name }}" Source/Android/app/build/outputs/apk/release/*.apk

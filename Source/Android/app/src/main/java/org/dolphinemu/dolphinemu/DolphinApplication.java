@@ -9,6 +9,7 @@ import android.hardware.usb.UsbManager;
 import com.google.android.material.color.DynamicColors;
 
 import org.dolphinemu.dolphinemu.model.AppTheme;
+import org.dolphinemu.dolphinemu.utils.CrashLog;
 import org.dolphinemu.dolphinemu.utils.DirectoryInitialization;
 import org.dolphinemu.dolphinemu.utils.Java_GCAdapter;
 import org.dolphinemu.dolphinemu.utils.Java_WiimoteAdapter;
@@ -23,6 +24,7 @@ public class DolphinApplication extends Application
   {
     super.onCreate();
     application = this;
+    CrashLog.install(this);
     VolleyUtil.init(getApplicationContext());
     System.loadLibrary("main");
 

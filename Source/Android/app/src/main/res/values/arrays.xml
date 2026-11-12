@@ -373,6 +373,7 @@
     <string-array name="gcpadTypeEntries">
         <item>@string/gcpad_disabled</item>
         <item>@string/gcpad_emulated</item>
+        <item>@string/gcpad_metroid</item>
         <item>@string/gcpad_keyboard</item>
         <item>@string/gcpad_steering_wheel</item>
         <item>@string/gcpad_dance_mat</item>
@@ -389,17 +390,20 @@
         <item>10</item>
         <item>11</item>
         <item>12</item>
+        <item>13</item>
     </integer-array>
 
     <string-array name="wiimoteTypeEntries">
         <item>@string/wiimote_disabled</item>
         <item>@string/wiimote_emulated</item>
         <item>@string/wiimote_real</item>
+        <item>@string/wiimote_metroid</item>
     </string-array>
     <integer-array name="wiimoteTypeValues">
         <item>0</item>
         <item>1</item>
         <item>2</item>
+        <item>3</item>
     </integer-array>
 
     <string-array name="gcpadButtons">

@@ -7,8 +7,13 @@
 
 namespace Config
 {
+#ifdef DOLPHIN_477M
+const Info<WiimoteSource> WIIMOTE_1_SOURCE{{System::WiiPad, "Wiimote1", "Source"},
+                                           WiimoteSource::Metroid};
+#else
 const Info<WiimoteSource> WIIMOTE_1_SOURCE{{System::WiiPad, "Wiimote1", "Source"},
                                            WiimoteSource::Emulated};
+#endif
 const Info<WiimoteSource> WIIMOTE_2_SOURCE{{System::WiiPad, "Wiimote2", "Source"},
                                            WiimoteSource::None};
 const Info<WiimoteSource> WIIMOTE_3_SOURCE{{System::WiiPad, "Wiimote3", "Source"},

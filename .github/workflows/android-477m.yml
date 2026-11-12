@@ -1,16 +1,16 @@
-# Builds Dolphin 477M (org.dolphinemu.dolphinemu.rg477m): the Android app with the RG477M
-# defaults (-DDOLPHIN_477M=ON, Source/Android/app/build.gradle.kts), arm64 only, debug-signed so
-# it installs as is. Native code is RelWithDebInfo in this build type, as upstream.
-name: Android APK (477M)
+# Builds PrimeHack 477M (org.dolphinemu.primehack.rg477m): PrimeHack's Android app with the
+# RG477M defaults (-DDOLPHIN_477M=ON, Source/Android/app/build.gradle.kts), arm64 only, signed
+# with the RG477M ports key. Native code is RelWithDebInfo in this build type, as upstream.
+name: Android APK (PrimeHack 477M)
 
 on:
   push:
-    branches: [master]
+    branches: [primehack-477m]
     paths-ignore: ['**/*.md', 'docs/**', 'Languages/**']
   workflow_dispatch:
 
 concurrency:
-  group: android-477m-${{ github.ref }}
+  group: primehack-477m-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -36,7 +36,7 @@ jobs:
       - name: Android SDK pieces
         run: |
           NDK=$(grep -oP 'ndkVersion = "\K[^"]+' Source/Android/app/build.gradle.kts)
-          SDK=$(grep -oP 'compileSdk = \K[0-9]+' Source/Android/app/build.gradle.kts)
+          SDK=$(grep -oP 'compileSdk(Version)? = "?(android-)?\K[0-9]+' Source/Android/app/build.gradle.kts)
           yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null || true
           SM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           "$SM" "ndk;$NDK" >/dev/null
@@ -47,7 +47,7 @@ jobs:
       - name: arm64 only, no unit tests
         working-directory: Source/Android/app
         run: |
-          sed -i 's|abiFilters += listOf("arm64-v8a", "x86_64")|abiFilters += listOf("arm64-v8a")|' build.gradle.kts
+          sed -i 's|abiFilters("arm64-v8a", "x86_64")|abiFilters("arm64-v8a")|' build.gradle.kts
           sed -i 's|^\(\s*\)//targets(|\1targets(|' build.gradle.kts
           grep -n 'abiFilters\|targets(' build.gradle.kts
 
@@ -56,11 +56,20 @@ jobs:
           path: |
             ~/.gradle/caches
             Source/Android/app/.cxx
-          key: dolphin-477m-${{ hashFiles('Source/Android/**/*.kts', 'Source/Android/gradle/libs.versions.toml') }}-${{ github.sha }}
-          restore-keys: dolphin-477m-${{ hashFiles('Source/Android/**/*.kts', 'Source/Android/gradle/libs.versions.toml') }}-
+          key: primehack-477m-${{ hashFiles('Source/Android/**/*.kts', 'Source/Android/gradle/libs.versions.toml') }}-${{ github.sha }}
+          restore-keys: primehack-477m-${{ hashFiles('Source/Android/**/*.kts', 'Source/Android/gradle/libs.versions.toml') }}-
+
+      - name: Signing key
+        run: |
+          git clone -q --depth 1 --filter=blob:none --sparse https://github.com/atrolle224/GammaOSNext keys
+          git -C keys sparse-checkout set ports/keys
+          echo "RG477M_KEYSTORE=$PWD/keys/ports/keys/rg477m-ports.keystore" >> $GITHUB_ENV
 
       - name: APK
         working-directory: Source/Android
+        env:
+          RG477M_KEYSTORE_PASSWORD: android
+          RG477M_KEY_ALIAS: rg477m
         run: |
           # CMake copies Data/Sys into the assets only when it configures, which the
           # cached .cxx skips: copy it here so every APK carries Sys (GameCube fonts etc.)
@@ -73,6 +82,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: dolphin-477m-arm64
+          name: primehack-477m-arm64
           path: Source/Android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error

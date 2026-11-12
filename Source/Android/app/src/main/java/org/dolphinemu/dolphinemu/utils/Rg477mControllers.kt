@@ -15,34 +15,46 @@ import org.dolphinemu.dolphinemu.features.settings.model.Settings
 import java.io.File
 
 /**
- * RG477M build: GameCube port 1 starts on the handheld's own controls (the built-in gamepad,
- * else the first connected one) with the "Android Gamepad" profile (Xbox-style layout: A/B/X/Y,
- * R1 = Z, triggers = L/R, right stick = C-stick), instead of the touchscreen. Dolphin's own
- * Default maps no buttons on Android. Done once, or again while port 1 still has no buttons;
+ * RG477M build: GameCube port 1 and Wii Remote 1 start on the handheld's own controls (the
+ * built-in gamepad, else the first connected one) with the PrimeHack 477M profile, instead of
+ * the touchscreen. Dolphin's own Default maps no buttons on Android. Done once per controller,
+ * or again while it still has no buttons;
  * a device or mapping chosen later stays. With CombineControllers on, a Bluetooth controller
  * then drives the same port.
  */
 object Rg477mControllers {
-    private const val KEY_GC = "rg477m_automap_gc1_v2"
-    private const val PROFILE = "Android Gamepad.ini"
+    private const val KEY_GC = "rg477m_primehack_gc1_v1"
+    private const val KEY_WII = "rg477m_primehack_wii1_v1"
+
+    // PrimeHack 477M: the right stick aims (Camera Control), R2 fires, the d-pad picks beams,
+    // L1 + d-pad visors (Data/Sys/Profiles/*/PrimeHack 477M.ini)
+    private const val PROFILE = "PrimeHack 477M.ini"
 
     fun apply(context: Context, settings: Settings) {
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-        val pad = EmulatedController.getGcPad(0)
-        if (prefs.getBoolean(KEY_GC, false) && hasButtons(pad)) return
         val device = gamepadDeviceString() ?: return
-        val current = pad.getDefaultDevice()
-        val onTouch = current.isEmpty() || current.endsWith("/Touchscreen")
-        if (onTouch || !hasButtons(pad)) {
-            val profile = File(pad.getSysProfileDirectoryPath(), PROFILE)
-            if (profile.exists()) pad.loadProfile(profile.path) else pad.loadDefaultSettings()
-            pad.setDefaultDevice(if (onTouch) device else current)
+        var changed = false
+        for ((key, pad) in listOf(
+            KEY_GC to EmulatedController.getGcPad(0),
+            KEY_WII to EmulatedController.getWiimote(0)
+        )) {
+            if (prefs.getBoolean(key, false) && hasButtons(pad)) continue
+            val current = pad.getDefaultDevice()
+            val onTouch = current.isEmpty() || current.endsWith("/Touchscreen")
+            if (onTouch || !hasButtons(pad)) {
+                val profile = File(pad.getSysProfileDirectoryPath(), PROFILE)
+                if (profile.exists()) pad.loadProfile(profile.path) else pad.loadDefaultSettings()
+                pad.setDefaultDevice(if (onTouch) device else current)
+                changed = true
+                Log.info("[Rg477mControllers] $key mapped to ${pad.getDefaultDevice()}")
+            }
+            prefs.edit { putBoolean(key, true) }
+        }
+        if (changed) {
             MappingCommon.save()
             // the touch controls are hidden once real controls are mapped (Overlay controls brings them back)
             BooleanSetting.MAIN_SHOW_INPUT_OVERLAY.setBoolean(settings, false)
-            Log.info("[Rg477mControllers] GameCube port 1 mapped to ${pad.getDefaultDevice()}")
         }
-        prefs.edit { putBoolean(KEY_GC, true) }
     }
 
     /** Whether the A button has a mapping (an empty port 1 maps nothing). */

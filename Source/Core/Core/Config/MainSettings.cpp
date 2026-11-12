@@ -173,8 +173,13 @@ const Info<std::string> MAIN_BBA_BUILTIN_IP{{System::Main, "Core", "BBA_BUILTIN_
 const Info<SerialInterface::SIDevices>& GetInfoForSIDevice(int channel)
 {
   static const std::array<const Info<SerialInterface::SIDevices>, 4> infos{
+#ifdef DOLPHIN_477M
+      Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice0"},
+                                       SerialInterface::SIDEVICE_GC_METROID},
+#else
       Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice0"},
                                        SerialInterface::SIDEVICE_GC_CONTROLLER},
+#endif
       Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice1"},
                                        SerialInterface::SIDEVICE_NONE},
       Info<SerialInterface::SIDevices>{{System::Main, "Core", "SIDevice2"},

@@ -51,6 +51,7 @@ class ControlGroup private constructor(private val pointer: Long) {
         const val TYPE_IMU_ACCELEROMETER = 11
         const val TYPE_IMU_GYROSCOPE = 12
         const val TYPE_IMU_CURSOR = 13
+        const val TYPE_PRIMEHACK_BEAMS = 17
 
         const val DEFAULT_ENABLED_ALWAYS = 0
         const val DEFAULT_ENABLED_YES = 1

@@ -2467,7 +2467,15 @@ class SettingsFragmentPresenter(
             addControllerMappingSettings(
                 sl,
                 wiimote,
-                ArraySet(listOf(ControlGroup.TYPE_ATTACHMENTS, ControlGroup.TYPE_OTHER))
+                ArraySet(
+                    listOf(
+                        ControlGroup.TYPE_ATTACHMENTS,
+                        ControlGroup.TYPE_OTHER,
+                        // PrimeHack: beams, and the right stick's Camera Control
+                        ControlGroup.TYPE_PRIMEHACK_BEAMS,
+                        ControlGroup.TYPE_STICK
+                    )
+                )
             )
         }
     }

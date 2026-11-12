@@ -813,6 +813,7 @@ It can efficiently compress both junk data and encrypted Wii data.
     <!-- GameCube Gamepad Types -->
     <string name="gcpad_disabled">None</string>
     <string name="gcpad_emulated">Standard Controller</string>
+    <string name="gcpad_metroid">Metroid (PrimeHack)</string>
     <string name="gcpad_keyboard">Keyboard Controller</string>
     <string name="gcpad_steering_wheel">Steering Wheel</string>
     <string name="gcpad_dance_mat">Dance Mat</string>
@@ -824,6 +825,7 @@ It can efficiently compress both junk data and encrypted Wii data.
     <string name="wiimote_disabled">None</string>
     <string name="wiimote_emulated">Emulated Wii Remote</string>
     <string name="wiimote_real">Real Wii Remote (DolphinBar required)</string>
+    <string name="wiimote_metroid">Metroid (PrimeHack)</string>
 
     <!-- Gamepad Controls -->
     <string name="gamepad_start">Start</string>

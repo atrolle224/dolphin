@@ -2285,7 +2285,8 @@ class InputOverlay(context: Context?, attrs: AttributeSet?) : SurfaceView(contex
         const val OVERLAY_NONE = 5
         private const val DISABLED_GAMECUBE_CONTROLLER = 0
         private const val EMULATED_GAMECUBE_CONTROLLER = 6
-        private const val EMULATED_AM_BASEBOARD = 11
+        private const val EMULATED_METROID_CONTROLLER = 7
+        private const val EMULATED_AM_BASEBOARD = 12
         private const val GAMECUBE_ADAPTER = 12
 
         // Buttons that have special positions in Wiimote only
@@ -2339,14 +2340,14 @@ class InputOverlay(context: Context?, attrs: AttributeSet?) : SurfaceView(contex
                 if (controllerIndex in 0 until 4) {
                     // GameCube controller
                     when (getSettingForSIDevice(controllerIndex).int) {
-                        EMULATED_GAMECUBE_CONTROLLER, EMULATED_AM_BASEBOARD -> {
+                        EMULATED_GAMECUBE_CONTROLLER, EMULATED_METROID_CONTROLLER, EMULATED_AM_BASEBOARD -> {
                             return OVERLAY_GAMECUBE
                         }
                     }
                 } else if (controllerIndex in 4 until 8) {
                     // Wii Remote
                     val wiimoteIndex = controllerIndex - 4
-                    if (getSettingForWiimoteSource(wiimoteIndex).int == 1) {
+                    if (getSettingForWiimoteSource(wiimoteIndex).int.let { it == 1 || it == 3 }) {
                         when (EmulatedController.getSelectedWiimoteAttachment(wiimoteIndex)) {
                             1 -> return OVERLAY_WIIMOTE_NUNCHUK
                             2 -> return OVERLAY_WIIMOTE_CLASSIC

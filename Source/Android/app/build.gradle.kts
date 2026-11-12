@@ -66,6 +66,15 @@ android {
                 keyPassword = project.property("keypass").toString()
             }
         }
+        // the RG477M ports key, so an update installs over the last build
+        create("rg477m") {
+            System.getenv("RG477M_KEYSTORE")?.let {
+                storeFile = file(it)
+                storePassword = System.getenv("RG477M_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("RG477M_KEY_ALIAS")
+                keyPassword = System.getenv("RG477M_KEYSTORE_PASSWORD")
+            }
+        }
     }
 
     // Define build types, which are orthogonal to product flavors.
@@ -88,8 +97,11 @@ android {
         // Signed by debug key disallowing distribution on Play Store.
         // Attaches "debug" suffix to version and package name, allowing installation alongside the release build.
         debug {
-            resValue("string", "app_name_suffixed", "Dolphin 477M")
+            resValue("string", "app_name_suffixed", "PrimeHack 477M")
             versionNameSuffix = "-477m"
+            if (System.getenv("RG477M_KEYSTORE") != null) {
+                signingConfig = signingConfigs.getByName("rg477m")
+            }
             isJniDebuggable = true
         }
     }

@@ -27,7 +27,7 @@ enum class IntSetting(
     MAIN_SLOT_B(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "SlotB", 255),
     MAIN_SERIAL_PORT_1(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "SerialPort1", 255),
     MAIN_FALLBACK_REGION(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "FallbackRegion", 2),
-    MAIN_SI_DEVICE_0(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "SIDevice0", 6),
+    MAIN_SI_DEVICE_0(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "SIDevice0", 7),
     MAIN_SI_DEVICE_1(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "SIDevice1", 0),
     MAIN_SI_DEVICE_2(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "SIDevice2", 0),
     MAIN_SI_DEVICE_3(Settings.FILE_DOLPHIN, Settings.SECTION_INI_CORE, "SIDevice3", 0),
@@ -134,7 +134,7 @@ enum class IntSetting(
         1000
     ),
     LOGGER_VERBOSITY(Settings.FILE_LOGGER, Settings.SECTION_LOGGER_OPTIONS, "Verbosity", 1),
-    WIIMOTE_1_SOURCE(Settings.FILE_WIIMOTE, "Wiimote1", "Source", 1),
+    WIIMOTE_1_SOURCE(Settings.FILE_WIIMOTE, "Wiimote1", "Source", 3),
     WIIMOTE_2_SOURCE(Settings.FILE_WIIMOTE, "Wiimote2", "Source", 0),
     WIIMOTE_3_SOURCE(Settings.FILE_WIIMOTE, "Wiimote3", "Source", 0),
     WIIMOTE_4_SOURCE(Settings.FILE_WIIMOTE, "Wiimote4", "Source", 0),

@@ -71,9 +71,10 @@
 namespace
 {
 constexpr char DOLPHIN_TAG[] = "DolphinEmuNative";
-constexpr char PACKAGE[] = "org.dolphinemu.mmjr";
-constexpr char PACKAGE_DEBUG[] = "org.dolphinemu.mmjr.debug";
-constexpr char LABEL[] = "Dolphin |MMJR2|";
+// the RG477M build's own package and name (build.gradle, strings.xml)
+constexpr char PACKAGE[] = "org.dolphinemu.mmjr.rg477m";
+constexpr char PACKAGE_DEBUG[] = "org.dolphinemu.mmjr.rg477m.debug";
+constexpr char LABEL[] = "Dolphin MMJR2 477M";
 
 ANativeWindow* s_surf;
 

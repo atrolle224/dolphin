@@ -79,7 +79,7 @@ enum class StringSetting(
         Settings.FILE_GFX,
         Settings.SECTION_GFX_ENHANCEMENTS,
         "PostProcessingShader",
-        ""
+        "crt_easymode"
     ),
     GFX_DRIVER_LIB_NAME(
         Settings.FILE_GFX,
